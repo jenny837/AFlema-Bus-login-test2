@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JassLin | AFlema Bus - Pro Precision V9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B22222',
+                        apple: { bg: '#F2F2F7', gray: '#8E8E93', border: '#E5E5EA' },
+                        dark: { bg: '#0A0A0C', card: '#1C1C1E', border: '#2C2C2E' }
+                    },
+                    borderRadius: { 'ios-card': '32px', 'ios': '14px' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, "SF Pro Display", "PingFang TC", sans-serif; }
+        body { background-color: #F2F2F7; transition: background-color 0.4s ease; overflow: hidden; }
+        .dark body { background-color: #0A0A0C; }
+        [v-cloak] { display: none; }
+
+        .main-title { font-weight: 800; color: #1D1D1F; transition: all 0.3s; }
+        .dark .main-title { color: #FFFFFF; }
+        .main-title .highlight-a { color: #B22222; }
+
+        /* --- Logo 定位 --- */
+        .fixed-logo { position: absolute; top: 30px; left: 30px; z-index: 100; }
+        .fixed-logo img { height: 32px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12)); }
+
+        /* --- 登入頁勾選框 --- */
+        .iso-checkbox {
+            appearance: none; width: 18px; height: 18px; border: 2px solid #E5E5EA; border-radius: 5px;
+            margin-right: 10px; cursor: pointer; position: relative; transition: all 0.4s;
+        }
+        .dark .iso-checkbox { border-color: #2C2C2E; }
+        .iso-checkbox:checked { background-color: #B22222; border-color: #B22222; }
+        .iso-checkbox:checked::after { content: '✓'; position: absolute; color: white; font-size: 12px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* --- 1. 側欄收合：流暢曲線、圖示／文字不跳躍 --- */
+        .sidebar-transition {
+            transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-pad-x {
+            transition: padding-left 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                padding-right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-brand-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            vertical-align: bottom;
+            transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s ease;
+            max-width: 120px;
+            opacity: 1;
+        }
+        .sidebar-brand-text.is-collapsed {
+            max-width: 0;
+            opacity: 0;
+        }
+        .nav-label-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+            min-width: 0;
+            transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.32s ease;
+        }
+        .nav-label-wrap.is-expanded {
+            flex: 1 1 auto;
+            max-width: 200px;
+            opacity: 1;
+        }
+        .nav-label-wrap.is-collapsed {
+            flex: 0 0 0px;
+            max-width: 0;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+        .nav-icon-slot {
+            width: 40px;
+            min-width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-user-block {
+            height: 72px;
+            min-height: 72px;
+            box-sizing: border-box;
+            transition: padding 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .smooth-transition { transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* --- 模式切換 --- */
+        .mode-switcher {
+            position: fixed; top: 20px; right: 20px; z-index: 200;
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.7); padding: 6px 10px; border-radius: 50px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); transform: scale(0.8);
+        }
+        .dark .mode-switcher { background: rgba(28,28,30,0.7); border-color: rgba(255,255,255,0.1); }
+        .iso-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .iso-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #E9E9EA; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: #34C759; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        /* --- 動畫 --- */
+        @keyframes card-out { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.9) translateY(-50px); opacity: 0; } }
+        @keyframes dashboard-in { 0% { transform: scale(1.02); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+        .transition-exit { animation: card-out 0.5s forwards; }
+        .transition-enter { animation: dashboard-in 0.6s forwards; }
+        .animate-shake { animation: shake 0.4s; }
+
+        /* 登入頁輸入框：參考 1-3白紅.html 的專業焦點手感 */
+        .glow-input { transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .glow-input:hover {
+            border-color: rgba(251, 191, 36, 0.35);
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
+        }
+        .dark .glow-input:hover {
+            border-color: rgba(251, 191, 36, 0.28);
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
+        }
+        .glow-input:focus {
+            border-color: rgba(251, 191, 36, 0.45) !important;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
+        }
+        .dark .glow-input:focus {
+            background-color: #2C2C2E;
+            border-color: rgba(251, 191, 36, 0.35) !important;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
+        }
+
+        /* 未輸入後開始輸入：溫和黃光（提醒已修正） */
+        .glow-input-warm {
+            border-color: rgba(251, 191, 36, 0.40) !important;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
+        }
+        .dark .glow-input-warm {
+            border-color: rgba(251, 191, 36, 0.32) !important;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
+        }
+
+        /* 未填帳密：亮但不刺眼的紅光 */
+        .glow-input-error {
+            border-color: rgba(178, 34, 34, 0.45) !important;
+            box-shadow: 0 0 0 4px rgba(178, 34, 34, 0.08), 0 0 18px rgba(178, 34, 34, 0.14);
+        }
+        .dark .glow-input-error {
+            border-color: rgba(220, 100, 100, 0.42) !important;
+            box-shadow: 0 0 0 4px rgba(220, 80, 80, 0.10), 0 0 20px rgba(220, 60, 60, 0.10);
+        }
+    </style>
+</head>
+<body class="dark:text-white">
+
+<div id="app" v-cloak>
+    <div class="mode-switcher">
+        <span class="text-[10px] font-bold text-apple-gray uppercase">{{ isDark ? 'Dark' : 'Light' }}</span>
+        <label class="iso-switch">
+            <input type="checkbox" v-model="isDark" @change="toggleDarkMode">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <transition leave-active-class="transition-exit">
+        <div v-if="!isLoggedIn" class="min-h-screen flex items-center justify-center p-5 relative">
+            <div class="fixed-logo"><img src="img/logo.png" alt="Logo"></div>
+            
+            <div class="bg-white dark:bg-dark-card w-full max-w-[420px] px-[40px] py-[50px] rounded-ios-card shadow-2xl text-center">
+                <div class="mb-10">
+                    <h1 class="main-title text-3xl"><span class="highlight-a">A</span>Flema Bus</h1>
+                    <p class="text-sm text-apple-gray mt-2 tracking-wide">車隊管理系統 | 中央監控平台</p>
+                </div>
+
+                <form @submit.prevent="handleLogin" class="text-left space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-apple-gray mb-2 ml-1">Account 帳戶</label>
+                        <input type="text" v-model="form.account" 
+                               :class="['glow-input w-full py-[14px] px-[18px] bg-[#F9F9FB] dark:bg-[#2C2C2E] border border-apple-border dark:border-transparent rounded-ios outline-none text-base', 
+                                        (loginError && !form.account) ? 'glow-input-error animate-shake' : (form.account ? 'glow-input-warm' : '')]" placeholder="請輸入帳戶">
+                    </div>
+                    <div class="relative">
+                        <label class="block text-xs font-semibold text-apple-gray mb-2 ml-1">Password 密碼</label>
+                        <div class="relative">
+                            <input :type="showPwd ? 'text' : 'password'" v-model="form.password" 
+                                   :class="['glow-input w-full py-[14px] px-[18px] bg-[#F9F9FB] dark:bg-[#2C2C2E] border border-apple-border dark:border-transparent rounded-ios outline-none text-base pr-[46px]', 
+                                            (loginError && !form.password) ? 'glow-input-error animate-shake' : (form.password ? 'glow-input-warm' : '')]" placeholder="請輸入密碼">
+                            <button type="button" @click="showPwd = !showPwd" class="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#636366] dark:text-apple-gray hover:text-primary flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path v-if="!showPwd" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path v-if="!showPwd" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    <path v-if="showPwd" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <label class="flex items-center text-sm text-apple-gray cursor-pointer group mt-6 mb-7 pl-1">
+                        <input type="checkbox" class="iso-checkbox"> 記住帳戶
+                    </label>
+                    <button type="submit" class="w-full p-4 bg-primary text-white rounded-ios font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">登入</button>
+                </form>
+            </div>
+        </div>
+    </transition>
+
+    <transition enter-active-class="transition-enter">
+        <div v-if="isLoggedIn" class="flex h-screen w-full">
+            
+            <aside :class="['sidebar-transition bg-white dark:bg-dark-card border-r border-apple-border dark:border-dark-border flex flex-col overflow-hidden', 
+                            isCollapsed ? 'w-[72px]' : 'w-[196px]']">
+                
+                <div class="h-16 flex items-center border-b border-gray-50 dark:border-white/5 shrink-0 sidebar-pad-x px-0 relative">
+                    <div class="flex items-center w-full min-w-0">
+                        <div class="flex items-center min-w-0 pl-4">
+                            <div class="nav-icon-slot">
+                                <span class="main-title text-2xl leading-none"><span class="highlight-a">A</span></span>
+                            </div>
+                            <span class="sidebar-brand-text text-2xl font-extrabold leading-none" :class="{ 'is-collapsed': isCollapsed }">Flema</span>
+                        </div>
+                        <button type="button" @click="isCollapsed = !isCollapsed" 
+                                class="absolute right-2 top-1/2 -translate-y-1/2 shrink-0 text-apple-gray hover:text-primary transition-colors duration-300 p-1 rounded-ios">
+                            <svg class="w-3.5 h-3.5 transition-transform duration-[450ms] ease-[cubic-bezier(0.4,0,0.2,1)]" :class="isCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-width="3" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto overflow-x-hidden px-0">
+                    <div v-for="(item, idx) in menu" :key="item.name" 
+                         :class="['smooth-transition flex items-center rounded-ios cursor-pointer group overflow-hidden relative',
+                                  idx === 0 ? 'h-[48px] mb-2' : 'h-12 mb-2',
+                                  item.active ? 'bg-primary/5 text-primary' : 'text-slate-500 hover:bg-gray-100 dark:hover:bg-white/5',
+                                  isCollapsed ? 'justify-center px-0' : 'pl-4 pr-3']">
+                        <div class="nav-icon-slot group-hover:text-primary [&_svg]:text-current" v-html="item.icon"></div>
+                        <span class="nav-label-wrap text-[15px] font-bold tracking-wide"
+                              :class="isCollapsed ? 'is-collapsed' : 'is-expanded ml-2'">{{ item.name }}</span>
+                    </div>
+                </nav>
+
+                <div class="sidebar-user-block border-t border-apple-border dark:border-dark-border shrink-0 sidebar-pad-x flex items-center px-0">
+                    <div class="flex items-center w-full min-w-0" :class="isCollapsed ? 'justify-center' : 'justify-start pl-4'">
+                        <div class="nav-icon-slot">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-black shrink-0 text-sm">A</div>
+                        </div>
+                        <div class="nav-label-wrap flex flex-col justify-center min-w-0 text-left"
+                             :class="isCollapsed ? 'is-collapsed' : 'is-expanded ml-2'">
+                            <p class="text-[11px] font-bold whitespace-nowrap leading-tight">Jass Lin</p>
+                            <button type="button" @click="isLoggedIn = false" class="text-[9px] text-red-500 font-bold uppercase whitespace-nowrap mt-0.5 text-left">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col overflow-hidden bg-apple-bg dark:bg-dark-bg">
+                <header class="h-16 flex items-center px-10 shrink-0 bg-white dark:bg-black/20 border-b border-apple-border dark:border-dark-border">
+                    <h1 class="main-title text-2xl">營運儀表板</h1>
+                </header>
+
+                <div class="px-10 h-[48px] flex items-center justify-between shrink-0 bg-white/50 dark:bg-white/5 text-[10px] font-bold text-apple-gray uppercase tracking-widest border-b border-apple-border dark:border-dark-border">
+                    <div class="flex items-center gap-6">
+                        <span class="flex items-center gap-2 text-green-600 dark:text-green-500">
+                            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span> ONLINE
+                        </span>
+                        <span class="opacity-60">HQ: TAIPEI CENTRAL</span>
+                    </div>
+                    <div class="flex items-center gap-4 font-mono">{{ currentTime }}</div>
+                </div>
+
+                <div class="flex-1 p-10 overflow-y-auto space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div v-for="stat in ['Fleet Online', 'Avg Fuel', 'On-Time', 'Alerts']" :key="stat" 
+                             class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border border-gray-100 dark:border-dark-border">
+                            <p class="text-[9px] font-bold text-apple-gray mb-3 uppercase">{{stat}}</p>
+                            <h3 class="text-3xl font-black">-- --</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-dark-card rounded-ios-card h-80 shadow-sm border border-gray-100 dark:border-dark-border p-8 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-slate-50 dark:bg-white/5 opacity-50"></div>
+                        <div class="text-center relative z-10">
+                            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                            <p class="text-apple-gray font-bold uppercase tracking-widest text-[10px]">Synchronizing GIS Data...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </transition>
+</div>
+
+<script>
+    const { createApp, ref, onMounted, onUnmounted } = Vue;
+    createApp({
+        setup() {
+            const isDark = ref(false);
+            const isLoggedIn = ref(false);
+            const isCollapsed = ref(false);
+            const showPwd = ref(false);
+            const loginError = ref(false);
+            const form = ref({ account: '', password: '' });
+            const currentTime = ref('');
+            let timer;
+
+            const menu = ref([
+                { name: '總覽面板', active: true, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>' },
+                { name: '即時監控', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
+                { name: '數據報表', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' },
+                { name: '安全預警', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' },
+            ]);
+
+            const toggleDarkMode = () => document.documentElement.classList.toggle('dark', isDark.value);
+            
+            const handleLogin = () => {
+                if (!form.value.account || !form.value.password) {
+                    loginError.value = true;
+                    setTimeout(() => loginError.value = false, 3000);
+                    return;
+                }
+                isLoggedIn.value = true;
+            };
+
+            const updateTime = () => {
+                const now = new Date();
+                currentTime.value = now.toLocaleString('zh-TW', { hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            };
+
+            onMounted(() => {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) { isDark.value = true; toggleDarkMode(); }
+                updateTime(); timer = setInterval(updateTime, 1000);
+            });
+            onUnmounted(() => clearInterval(timer));
+
+            return { isDark, isLoggedIn, isCollapsed, showPwd, loginError, form, menu, currentTime, toggleDarkMode, handleLogin };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
