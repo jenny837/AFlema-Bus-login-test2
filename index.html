@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -34,11 +36,10 @@
         .dark .main-title { color: #FFFFFF; }
         .main-title .highlight-a { color: #B22222; }
 
-        /* --- Logo 定位 --- */
         .fixed-logo { position: absolute; top: 30px; left: 30px; z-index: 100; }
         .fixed-logo img { height: 32px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12)); }
 
-        /* --- 登入頁勾選框 --- */
+        /* --- 勾選框 --- */
         .iso-checkbox {
             appearance: none; width: 18px; height: 18px; border: 2px solid #E5E5EA; border-radius: 5px;
             margin-right: 10px; cursor: pointer; position: relative; transition: all 0.4s;
@@ -47,66 +48,19 @@
         .iso-checkbox:checked { background-color: #B22222; border-color: #B22222; }
         .iso-checkbox:checked::after { content: '✓'; position: absolute; color: white; font-size: 12px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* --- 1. 側欄收合：流暢曲線、圖示／文字不跳躍 --- */
-        .sidebar-transition {
-            transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .sidebar-pad-x {
-            transition: padding-left 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-                padding-right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .sidebar-brand-text {
-            display: inline-block;
-            overflow: hidden;
-            white-space: nowrap;
-            vertical-align: bottom;
-            transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.35s ease;
-            max-width: 120px;
-            opacity: 1;
-        }
-        .sidebar-brand-text.is-collapsed {
-            max-width: 0;
-            opacity: 0;
-        }
-        .nav-label-wrap {
-            overflow: hidden;
-            white-space: nowrap;
-            min-width: 0;
-            transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.32s ease;
-        }
-        .nav-label-wrap.is-expanded {
-            flex: 1 1 auto;
-            max-width: 200px;
-            opacity: 1;
-        }
-        .nav-label-wrap.is-collapsed {
-            flex: 0 0 0px;
-            max-width: 0;
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-            pointer-events: none;
-        }
-        .nav-icon-slot {
-            width: 40px;
-            min-width: 40px;
-            height: 40px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .sidebar-user-block {
-            height: 72px;
-            min-height: 72px;
-            box-sizing: border-box;
-            transition: padding 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        /* --- 側邊欄動畫 --- */
+        .sidebar-transition { transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-pad-x { transition: padding-left 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding-right 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-brand-text { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; max-width: 120px; opacity: 1; }
+        .sidebar-brand-text.is-collapsed { max-width: 0; opacity: 0; }
+        .nav-label-wrap { overflow: hidden; white-space: nowrap; min-width: 0; transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease; }
+        .nav-label-wrap.is-expanded { flex: 1 1 auto; max-width: 200px; opacity: 1; }
+        .nav-label-wrap.is-collapsed { flex: 0 0 0px; max-width: 0; opacity: 0; padding: 0; margin: 0; pointer-events: none; }
+        .nav-icon-slot { width: 40px; min-width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .sidebar-user-block { height: 72px; min-height: 72px; box-sizing: border-box; transition: padding 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
         .smooth-transition { transition: background-color 0.3s ease, color 0.3s ease; }
 
-        /* --- 模式切換 --- */
+        /* --- 模式切換器 --- */
         .mode-switcher {
             position: fixed; top: 20px; right: 20px; z-index: 200;
             display: flex; align-items: center; gap: 8px;
@@ -121,7 +75,7 @@
         input:checked + .slider { background-color: #34C759; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* --- 動畫 --- */
+        /* --- 動畫效果 --- */
         @keyframes card-out { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.9) translateY(-50px); opacity: 0; } }
         @keyframes dashboard-in { 0% { transform: scale(1.02); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
@@ -129,57 +83,27 @@
         .transition-enter { animation: dashboard-in 0.6s forwards; }
         .animate-shake { animation: shake 0.4s; }
 
-        /* 登入頁輸入框：參考 1-3白紅.html 的專業焦點手感 */
-        .glow-input { transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
-        .glow-input:hover {
-            border-color: rgba(251, 191, 36, 0.35);
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
-        }
-        .dark .glow-input:hover {
-            border-color: rgba(251, 191, 36, 0.28);
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
-        }
-        .glow-input:focus {
-            border-color: rgba(251, 191, 36, 0.45) !important;
-            background-color: #FFFFFF;
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
-        }
-        .dark .glow-input:focus {
-            background-color: #2C2C2E;
-            border-color: rgba(251, 191, 36, 0.35) !important;
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
-        }
-
-        /* 未輸入後開始輸入：溫和黃光（提醒已修正） */
-        .glow-input-warm {
-            border-color: rgba(251, 191, 36, 0.40) !important;
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10), 0 0 18px rgba(251, 191, 36, 0.10);
-        }
-        .dark .glow-input-warm {
-            border-color: rgba(251, 191, 36, 0.32) !important;
-            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08), 0 0 20px rgba(251, 191, 36, 0.08);
-        }
-
-        /* 未填帳密：亮但不刺眼的紅光 */
-        .glow-input-error {
-            border-color: rgba(178, 34, 34, 0.45) !important;
-            box-shadow: 0 0 0 4px rgba(178, 34, 34, 0.08), 0 0 18px rgba(178, 34, 34, 0.14);
-        }
-        .dark .glow-input-error {
-            border-color: rgba(220, 100, 100, 0.42) !important;
-            box-shadow: 0 0 0 4px rgba(220, 80, 80, 0.10), 0 0 20px rgba(220, 60, 60, 0.10);
-        }
+        /* --- 輸入框狀態 --- */
+        .glow-input { transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .glow-input:focus { border-color: rgba(251, 191, 36, 0.45) !important; background-color: #FFFFFF; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10); }
+        .dark .glow-input:focus { background-color: #2C2C2E; border-color: rgba(251, 191, 36, 0.35) !important; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08); }
+        .glow-input-error { border-color: rgba(178, 34, 34, 0.45) !important; box-shadow: 0 0 0 4px rgba(178, 34, 34, 0.14) !important; }
+        .glow-input-warm { border-color: rgba(251, 191, 36, 0.40) !important; }
     </style>
 </head>
 <body class="dark:text-white">
 
 <div id="app" v-cloak>
-    <div class="mode-switcher">
-        <span class="text-[10px] font-bold text-apple-gray uppercase">{{ isDark ? 'Dark' : 'Light' }}</span>
-        <label class="iso-switch">
-            <input type="checkbox" v-model="isDark" @change="toggleDarkMode">
-            <span class="slider"></span>
-        </label>
+    <div class="fixed top-0 right-0 h-16 flex items-center px-10 z-[500]">
+        <div class="flex items-center gap-3">
+            <span class="text-[13px] font-bold text-apple-gray uppercase tracking-tight">
+                {{ isDark ? '夜間' : '日間' }}
+            </span>
+            <label class="iso-switch">
+                <input type="checkbox" v-model="isDark" @change="toggleDarkMode">
+                <span class="slider"></span>
+            </label>
+        </div>
     </div>
 
     <transition leave-active-class="transition-exit">
@@ -205,7 +129,7 @@
                             <input :type="showPwd ? 'text' : 'password'" v-model="form.password" 
                                    :class="['glow-input w-full py-[14px] px-[18px] bg-[#F9F9FB] dark:bg-[#2C2C2E] border border-apple-border dark:border-transparent rounded-ios outline-none text-base pr-[46px]', 
                                             (loginError && !form.password) ? 'glow-input-error animate-shake' : (form.password ? 'glow-input-warm' : '')]" placeholder="請輸入密碼">
-                            <button type="button" @click="showPwd = !showPwd" class="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#636366] dark:text-apple-gray hover:text-primary flex items-center justify-center">
+                            <button type="button" @click="showPwd = !showPwd" class="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#636366] dark:text-apple-gray">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path v-if="!showPwd" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path v-if="!showPwd" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     <path v-if="showPwd" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
@@ -213,7 +137,7 @@
                             </button>
                         </div>
                     </div>
-                    <label class="flex items-center text-sm text-apple-gray cursor-pointer group mt-6 mb-7 pl-1">
+                    <label class="flex items-center text-sm text-apple-gray cursor-pointer mt-6 mb-7 pl-1">
                         <input type="checkbox" class="iso-checkbox"> 記住帳戶
                     </label>
                     <button type="submit" class="w-full p-4 bg-primary text-white rounded-ios font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">登入</button>
@@ -237,8 +161,8 @@
                             <span class="sidebar-brand-text text-2xl font-extrabold leading-none" :class="{ 'is-collapsed': isCollapsed }">Flema</span>
                         </div>
                         <button type="button" @click="isCollapsed = !isCollapsed" 
-                                class="absolute right-2 top-1/2 -translate-y-1/2 shrink-0 text-apple-gray hover:text-primary transition-colors duration-300 p-1 rounded-ios">
-                            <svg class="w-3.5 h-3.5 transition-transform duration-[450ms] ease-[cubic-bezier(0.4,0,0.2,1)]" :class="isCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-apple-gray hover:text-primary transition-colors p-1">
+                            <svg class="w-3.5 h-3.5 transition-transform duration-500" :class="isCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-width="3" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                             </svg>
                         </button>
@@ -246,69 +170,225 @@
                 </div>
 
                 <nav class="flex-1 overflow-y-auto overflow-x-hidden px-0">
-                    <div v-for="(item, idx) in menu" :key="item.name" 
-                         :class="['smooth-transition flex items-center rounded-ios cursor-pointer group overflow-hidden relative',
-                                  idx === 0 ? 'h-[48px] mb-2' : 'h-12 mb-2',
-                                  item.active ? 'bg-primary/5 text-primary' : 'text-slate-500 hover:bg-gray-100 dark:hover:bg-white/5',
+                    <div v-for="item in menu" :key="item.id" 
+                         @click="currentTab = item.id"
+                         :class="['smooth-transition flex items-center h-12 mb-2 rounded-ios cursor-pointer group relative',
+                                  currentTab === item.id ? 'bg-primary/5 text-primary' : 'text-slate-500 hover:bg-gray-100 dark:hover:bg-white/5',
                                   isCollapsed ? 'justify-center px-0' : 'pl-4 pr-3']">
-                        <div class="nav-icon-slot group-hover:text-primary [&_svg]:text-current" v-html="item.icon"></div>
+                        <div class="nav-icon-slot" v-html="item.icon"></div>
                         <span class="nav-label-wrap text-[15px] font-bold tracking-wide"
                               :class="isCollapsed ? 'is-collapsed' : 'is-expanded ml-2'">{{ item.name }}</span>
                     </div>
                 </nav>
 
-                <div class="sidebar-user-block border-t border-apple-border dark:border-dark-border shrink-0 sidebar-pad-x flex items-center px-0">
+                <div class="sidebar-user-block border-t border-apple-border dark:border-dark-border flex items-center px-0">
                     <div class="flex items-center w-full min-w-0" :class="isCollapsed ? 'justify-center' : 'justify-start pl-4'">
-                        <div class="nav-icon-slot">
-                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-black shrink-0 text-sm">A</div>
-                        </div>
-                        <div class="nav-label-wrap flex flex-col justify-center min-w-0 text-left"
-                             :class="isCollapsed ? 'is-collapsed' : 'is-expanded ml-2'">
-                            <p class="text-[11px] font-bold whitespace-nowrap leading-tight">Jass Lin</p>
-                            <button type="button" @click="isLoggedIn = false" class="text-[9px] text-red-500 font-bold uppercase whitespace-nowrap mt-0.5 text-left">Logout</button>
+                        <div class="nav-icon-slot"><div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-black text-sm">A</div></div>
+                        <div v-if="!isCollapsed" class="nav-label-wrap ml-2">
+                            <p class="text-sm font-bold truncate">Jass Lin</p>
+                            <button @click="isLoggedIn = false" class="text-[10px] text-red-500 font-bold uppercase">登出</button>
                         </div>
                     </div>
                 </div>
             </aside>
-
+            
             <main class="flex-1 flex flex-col overflow-hidden bg-apple-bg dark:bg-dark-bg">
-                <header class="h-16 flex items-center px-10 shrink-0 bg-white dark:bg-black/20 border-b border-apple-border dark:border-dark-border">
-                    <h1 class="main-title text-2xl">總覽面板</h1>
-                </header>
+<header class="h-16 flex items-center justify-between px-10 shrink-0 bg-white dark:bg-black/20 border-b border-apple-border dark:border-dark-border">
+    <div class="flex flex-col">
+        <div class="flex items-center gap-3">
+            <h1 class="main-title text-xl font-bold">{{ currentMenuName }}</h1>
+            <span class="flex items-center gap-1.5 text-[12px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span> ONLINE
+            </span>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+        <div class="text-[14px] font-bold text-apple-gray text-right">
+            <p class="leading-none uppercase tracking-tighter opacity-60">最後更新{{ currentTime.split(' ')[1] }} 
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2 border-l border-apple-border dark:border-dark-border pl-6 min-w-[80px] invisible">
+            <span class="text-[10px] font-bold uppercase">Light</span>
+            <div class="iso-switch"><span class="slider"></span></div>
+        </div>
+    </div>
+</header>
 
-                <div class="px-10 h-[48px] flex items-center justify-between shrink-0 bg-white/50 dark:bg-white/5 text-[10px] font-bold text-apple-gray uppercase tracking-widest border-b border-apple-border dark:border-dark-border">
+                <div class="px-10 h-12 flex items-center justify-between shrink-0 bg-white/50 dark:bg-white/5 text-xs font-bold text-apple-gray uppercase tracking-widest border-b border-apple-border dark:border-dark-border">
                     <div class="flex items-center gap-6">
                         <span class="flex items-center gap-2 text-green-600 dark:text-green-500">
-                            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span> ONLINE
+                            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
                         </span>
-                        <span class="opacity-60">HQ: TAIPEI CENTRAL</span>
+                        <span class="opacity-60"></span>
                     </div>
-                    <div class="flex items-center gap-4 font-mono">{{ currentTime }}</div>
+                    <div class="font-mono"></div>
                 </div>
 
-                <div class="flex-1 p-10 overflow-y-auto space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div v-for="stat in ['Fleet Online', 'Avg Fuel', 'On-Time', 'Alerts']" :key="stat" 
-                             class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border border-gray-100 dark:border-dark-border">
-                            <p class="text-[9px] font-bold text-apple-gray mb-3 uppercase">{{stat}}</p>
-                            <h3 class="text-3xl font-black">-- --</h3>
+                <div class="flex-1 p-10 overflow-y-auto">
+    
+    <div v-if="currentTab === 'dashboard'" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div v-for="stat in [
+            {label:'車輛總數', val:'3000', unit:'輛', color:'text-green-500'}, 
+            {label:'上線車輛', val:'2928', unit:'輛', color:'text-green-500'}, 
+            {label:'今日里程', val:'9.8', unit:'公里', color:'text-green-500'}, 
+            {label:'進行中告警', val:'3', unit:'件', color:'text-orange-500'}]" :key="stat.label" 
+             class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border">
+            <p class="text-apple-gray font-bold mb-4">{{stat.label}}</p>
+            <div class="flex items-baseline gap-2">
+                <h3 :class="['text-5xl font-black', stat.color]">{{stat.val}}</h3>
+                <span class="text-apple-gray font-bold" v-if="stat.unit">{{stat.unit}}</span>
+            </div>
+        </div>
+    </div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    
+    <div class="lg:col-span-3 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-8 flex flex-col h-full">
+        <div class="flex items-center justify-between mb-6 border-b border-apple-border dark:border-dark-border pb-4">
+            <h4 class="font-bold">車輛狀態</h4>
+            <div class="w-full max-w-[200px] h-1 bg-apple-bg dark:bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-primary w-[70%]"></div>
+            </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center min-h-[400px] text-apple-gray opacity-20">
+            <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-width="1" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-6 flex flex-col h-full">
+        <div class="flex justify-between items-center mb-6">
+            <h4 class="font-bold">最近告警</h4>
+            <button @click="currentTab = 'alerts'" class="bg-orange-500 text-white text-xs px-3 py-1 rounded-ios font-bold hover:brightness-110">前往告警事件</button>
+        </div>
+        <div class="space-y-4 flex-1"> <div v-for="i in 3" :key="i" class="p-4 bg-apple-bg dark:bg-white/5 rounded-ios border-l-4 border-orange-500">
+                <p class="text-xs font-bold text-apple-gray mb-1">2026-04-22 14:40</p>
+                <p class="font-bold text-sm">AF-102 嚴重超速</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+    <div v-if="currentTab === 'monitor'" class="h-full flex flex-col">
+        <div class="flex-1 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border flex overflow-hidden">
+            <div class="w-72 border-r border-apple-border dark:border-dark-border flex flex-col bg-gray-50/30 dark:bg-black/20">
+                <div class="p-4 border-b border-apple-border dark:border-dark-border">
+                    <input type="text" placeholder="搜尋車號或駕駛..." class="w-full bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 py-2 text-xs outline-none focus:border-primary">
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-2">
+                    <div v-for="i in 6" :key="i" class="p-4 rounded-ios bg-white dark:bg-white/5 shadow-sm border border-transparent hover:border-primary/50 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-bold text-sm">AF-{{100 + i}}</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                         </div>
-                    </div>
-                    <div class="bg-white dark:bg-dark-card rounded-ios-card h-80 shadow-sm border border-gray-100 dark:border-dark-border p-8 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-slate-50 dark:bg-white/5 opacity-50"></div>
-                        <div class="text-center relative z-10">
-                            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-                            <p class="text-apple-gray font-bold uppercase tracking-widest text-[10px]">Synchronizing GIS Data...</p>
-                        </div>
+                        <p class="text-[11px] text-apple-gray">林曉明 · 時速 62 km/h</p>
+                        <p class="text-[10px] text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">點擊追蹤位置</p>
                     </div>
                 </div>
+            </div>
+            <div class="flex-1 bg-slate-100 dark:bg-black/40 relative flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#B22222 1px, transparent 1px); background-size: 30px 30px;"></div>
+                <div class="text-center z-10">
+                    <div class="w-20 h-20 bg-white dark:bg-dark-card rounded-full shadow-2xl flex items-center justify-center mx-auto mb-4 border border-apple-border dark:border-dark-border">
+                        <svg class="w-10 h-10 text-primary animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                    </div>
+                    <p class="text-xs font-bold text-apple-gray uppercase tracking-widest">Map Engine Ready</p>
+                    <p class="text-[10px] text-apple-gray mt-1">等待 GPS 訊號接入...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="currentTab === 'reports'" class="space-y-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold">歷史行程報表</h2>
+                <p class="text-xs text-apple-gray">查詢過去 30 天內的車輛運行紀錄</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="px-4 py-2 bg-white dark:bg-dark-card border border-apple-border dark:border-dark-border text-xs font-bold rounded-ios hover:bg-gray-50 transition-colors">篩選條件</button>
+                <button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-ios shadow-md hover:brightness-110">匯出 CSV</button>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-apple-bg dark:bg-white/5 text-[11px] text-apple-gray uppercase font-bold tracking-wider">
+                    <tr>
+                        <th class="px-8 py-5">日期時間</th>
+                        <th class="px-8 py-5">車號 / 駕駛</th>
+                        <th class="px-8 py-5">起點 - 終點</th>
+                        <th class="px-8 py-5">油耗評分</th>
+                        <th class="px-8 py-5">狀態</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-apple-border dark:divide-dark-border">
+                    <tr v-for="i in 6" :key="i" class="hover:bg-apple-bg dark:hover:bg-white/5 transition-colors cursor-default">
+                        <td class="px-8 py-5 font-mono text-xs">2026-04-22 08:3{{i}}</td>
+                        <td class="px-8 py-5">
+                            <p class="font-bold">AF-20{{i}}</p>
+                            <p class="text-[11px] text-apple-gray">陳大文</p>
+                        </td>
+                        <td class="px-8 py-5 text-xs">台北轉運站 → 桃園機場</td>
+                        <td class="px-8 py-5">
+                            <div class="flex gap-0.5">
+                                <span v-for="s in 5" :class="['w-2 h-2 rounded-full', s <= 4 ? 'bg-amber-400' : 'bg-gray-200 dark:bg-white/10']"></span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 text-[10px] font-bold rounded-full">已完成</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div v-if="currentTab === 'alerts'" class="max-w-4xl mx-auto space-y-6">
+        <div class="flex justify-between items-end mb-4">
+            <h2 class="text-xl font-bold">告警管理</h2>
+            <p class="text-xs text-primary font-bold">● 3 則未處理事件</p>
+        </div>
+        <div v-for="alert in [
+            {time:'10:24', type:'嚴重超速預警', vcl:'AF-102', driver:'林曉明', level:'Critical', loc:'國道一號 32K'},
+            {time:'09:45', type:'異常怠速 (超過 15 分鐘)', vcl:'AF-105', driver:'張小華', level:'Warning', loc:'泰山停車場'},
+            {time:'08:12', type:'非預定路徑進入', vcl:'AF-201', driver:'陳大文', level:'Normal', loc:'內湖區瑞光路'}
+        ]" :key="alert.time" 
+             class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border-l-4 flex items-center justify-between group hover:shadow-md transition-all"
+             :class="alert.level === 'Critical' ? 'border-primary' : (alert.level === 'Warning' ? 'border-amber-400' : 'border-blue-400')">
+            <div class="flex items-center gap-6">
+                <div class="text-3xl font-black text-apple-gray/20 font-mono">{{alert.time}}</div>
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10">{{alert.vcl}}</span>
+                        <span class="text-xs text-apple-gray">{{alert.driver}}</span>
+                    </div>
+                    <h4 class="font-bold text-lg">{{alert.type}}</h4>
+                    <p class="text-[11px] text-apple-gray mt-1 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                        {{alert.loc}}
+                    </p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="px-4 py-2 border border-apple-border dark:border-dark-border text-xs font-bold rounded-ios hover:bg-gray-50 transition-colors">忽略</button>
+                <button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-ios shadow-md hover:brightness-110">立即處置</button>
+            </div>
+        </div>
+    </div>
+
+</div>
             </main>
         </div>
     </transition>
 </div>
 
 <script>
-    const { createApp, ref, onMounted, onUnmounted } = Vue;
+    const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
     createApp({
         setup() {
             const isDark = ref(false);
@@ -318,14 +398,20 @@
             const loginError = ref(false);
             const form = ref({ account: '', password: '' });
             const currentTime = ref('');
+            const currentTab = ref('dashboard');
             let timer;
 
             const menu = ref([
-                { name: '總覽面板', active: true, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>' },
-                { name: '即時監控', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
-                { name: '數據報表', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' },
-                { name: '安全預警', active: false, icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' },
+                { id: 'dashboard', name: '總覽面板', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6h6v6H4zM14 6h6v6h-6zM4 16h6v6H4zM14 16h6v6h-6z"/></svg>' },
+                { id: 'monitor', name: '監控中心', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
+                { id: 'reports', name: '報表分析', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' },
+                { id: 'alerts', name: '告警管理', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' },
             ]);
+
+            const currentMenuName = computed(() => {
+                const item = menu.value.find(m => m.id === currentTab.value);
+                return item ? item.name : '';
+            });
 
             const toggleDarkMode = () => document.documentElement.classList.toggle('dark', isDark.value);
             
@@ -349,7 +435,7 @@
             });
             onUnmounted(() => clearInterval(timer));
 
-            return { isDark, isLoggedIn, isCollapsed, showPwd, loginError, form, menu, currentTime, toggleDarkMode, handleLogin };
+            return { isDark, isLoggedIn, isCollapsed, showPwd, loginError, form, menu, currentTime, currentTab, currentMenuName, toggleDarkMode, handleLogin };
         }
     }).mount('#app');
 </script>
