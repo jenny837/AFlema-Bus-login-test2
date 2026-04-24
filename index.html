@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -9,7 +7,7 @@
     <link rel="icon" href="img/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    
+    <!-- Tailwind：主題色、深色 class、圓角 token -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -27,6 +25,7 @@
     </script>
 
     <style>
+        /* ========== 全域 / 版型 ========== */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, "SF Pro Display", "PingFang TC", sans-serif; }
         body { background-color: #F2F2F7; transition: background-color 0.4s ease; overflow: hidden; }
         .dark body { background-color: #0A0A0C; }
@@ -36,10 +35,10 @@
         .dark .main-title { color: #FFFFFF; }
         .main-title .highlight-a { color: #B22222; }
 
+        /* ========== 登入頁 ========== */
         .fixed-logo { position: absolute; top: 30px; left: 30px; z-index: 100; }
         .fixed-logo img { height: 32px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12)); }
 
-        /* --- 勾選框 --- */
         .iso-checkbox {
             appearance: none; width: 18px; height: 18px; border: 2px solid #E5E5EA; border-radius: 5px;
             margin-right: 10px; cursor: pointer; position: relative; transition: all 0.4s;
@@ -48,10 +47,10 @@
         .iso-checkbox:checked { background-color: #B22222; border-color: #B22222; }
         .iso-checkbox:checked::after { content: '✓'; position: absolute; color: white; font-size: 12px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* --- 側邊欄動畫 --- */
+        /* ========== 側邊欄（收合、選單文字、漢堡槽） ========== */
         .sidebar-transition { transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
         .sidebar-pad-x { transition: padding-left 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding-right 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar-brand-text { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; max-width: 120px; opacity: 1; }
+        .sidebar-brand-text { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; max-width: 140px; opacity: 1; }
         .sidebar-brand-text.is-collapsed { max-width: 0; opacity: 0; }
         .nav-label-wrap { overflow: hidden; white-space: nowrap; min-width: 0; transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease; }
         .nav-label-wrap.is-expanded { flex: 1 1 auto; max-width: 200px; opacity: 1; }
@@ -60,14 +59,89 @@
         .sidebar-user-block { height: 72px; min-height: 72px; box-sizing: border-box; transition: padding 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
         .smooth-transition { transition: background-color 0.3s ease, color 0.3s ease; }
 
-        /* --- 模式切換器 --- */
-        .mode-switcher {
-            position: fixed; top: 20px; right: 20px; z-index: 200;
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.7); padding: 6px 10px; border-radius: 50px;
-            backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); transform: scale(0.8);
+        /* ========== 總覽：車輛狀態柱狀圖 ========== */
+        .vehicle-chart { position: relative; width: 100%; height: 360px; }
+        .vehicle-chart-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 48px 1fr; grid-template-rows: 1fr 28px; gap: 10px; }
+        .vehicle-y { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 0 0; }
+        .vehicle-y .tick { font-size: 10px; font-weight: 800; color: rgba(142,142,147,0.85); text-align: right; padding-right: 6px; }
+        .dark .vehicle-y .tick { color: rgba(142,142,147,0.75); }
+        .vehicle-plot { position: relative; border-bottom: 1px solid rgba(229,229,234,0.9); }
+        .dark .vehicle-plot { border-bottom-color: rgba(44,44,46,0.9); }
+        .vehicle-plot::before {
+            content: "";
+            position: absolute; inset: 0;
+            background-image: linear-gradient(to top, rgba(229,229,234,0.55) 1px, transparent 1px);
+            background-size: 100% 20%;
+            pointer-events: none;
         }
-        .dark .mode-switcher { background: rgba(28,28,30,0.7); border-color: rgba(255,255,255,0.1); }
+        .dark .vehicle-plot::before {
+            background-image: linear-gradient(to top, rgba(44,44,46,0.65) 1px, transparent 1px);
+        }
+        .vehicle-bars { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(var(--cols, 13), minmax(0, 1fr)); align-items: end; gap: 4px; padding: 8px 4px 10px; }
+        .vehicle-bar {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            cursor: default;
+        }
+        .vehicle-bar > span {
+            width: 70%;
+            max-width: 16px;
+            border-radius: 9px;
+            background: rgba(209,209,214,0.9);
+            transition: background-color 0.18s ease, transform 0.18s ease, filter 0.18s ease;
+            transform-origin: bottom;
+        }
+        .dark .vehicle-bar > span { background: rgba(142,142,147,0.35); }
+        .vehicle-bar.is-active > span {
+            background: #B22222;
+            filter: drop-shadow(0 10px 18px rgba(178,34,34,0.22));
+        }
+        .vehicle-x { display: grid; grid-template-columns: 48px 1fr; align-items: end; }
+        .vehicle-x-labels { display: grid; grid-template-columns: repeat(var(--cols, 13), minmax(0, 1fr)); gap: 4px; padding: 0 4px; }
+        @media (max-width: 640px) {
+            .vehicle-chart { height: 300px; }
+            .vehicle-x-labels .tick { font-size: 8px; }
+        }
+        .vehicle-x-labels .tick { font-size: 10px; font-weight: 900; color: rgba(142,142,147,0.85); text-align: center; }
+        .dark .vehicle-x-labels .tick { color: rgba(142,142,147,0.75); }
+        .vehicle-tooltip {
+            position: absolute;
+            min-width: 86px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(28,28,30,0.92);
+            color: white;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.10);
+            transform: translate(-50%, -110%);
+            pointer-events: none;
+            z-index: 50;
+        }
+        .dark .vehicle-tooltip { background: rgba(255,255,255,0.92); color: #0A0A0C; border-color: rgba(0,0,0,0.06); }
+        .vehicle-tooltip .t1 { font-size: 10px; font-weight: 900; opacity: 0.95; }
+        .vehicle-tooltip .t2 { margin-top: 2px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+        .vehicle-tooltip .sw { width: 8px; height: 8px; border-radius: 2px; background: #B22222; }
+        .vehicle-tooltip::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -6px;
+            width: 10px;
+            height: 10px;
+            background: inherit;
+            border-right: 1px solid rgba(255,255,255,0.10);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .dark .vehicle-tooltip::after {
+            border-right-color: rgba(0,0,0,0.06);
+            border-bottom-color: rgba(0,0,0,0.06);
+        }
+
+        /* ========== 深色模式開關（頂欄與登入頁共用元件） ========== */
         .iso-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .iso-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; inset: 0; background-color: #E9E9EA; transition: .4s; border-radius: 34px; }
@@ -75,7 +149,7 @@
         input:checked + .slider { background-color: #34C759; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* --- 動畫效果 --- */
+        /* ========== 頁面轉場 / 動畫 ========== */
         @keyframes card-out { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.9) translateY(-50px); opacity: 0; } }
         @keyframes dashboard-in { 0% { transform: scale(1.02); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
@@ -83,7 +157,7 @@
         .transition-enter { animation: dashboard-in 0.6s forwards; }
         .animate-shake { animation: shake 0.4s; }
 
-        /* --- 輸入框狀態 --- */
+        /* ========== 登入表單輸入框狀態 ========== */
         .glow-input { transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         .glow-input:focus { border-color: rgba(251, 191, 36, 0.45) !important; background-color: #FFFFFF; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.10); }
         .dark .glow-input:focus { background-color: #2C2C2E; border-color: rgba(251, 191, 36, 0.35) !important; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08); }
@@ -94,7 +168,8 @@
 <body class="dark:text-white">
 
 <div id="app" v-cloak>
-    <div class="fixed top-0 right-0 h-16 flex items-center px-10 z-[500]">
+    <!-- 全域：日/夜模式（登入前後皆顯示） -->
+    <div class="fixed top-0 right-0 h-16 flex items-center px-4 sm:px-6 lg:px-10 z-[500]">
         <div class="flex items-center gap-3">
             <span class="text-[13px] font-bold text-apple-gray uppercase tracking-tight">
                 {{ isDark ? '夜間' : '日間' }}
@@ -106,6 +181,7 @@
         </div>
     </div>
 
+    <!-- 登入畫面 -->
     <transition leave-active-class="transition-exit">
         <div v-if="!isLoggedIn" class="min-h-screen flex items-center justify-center p-5 relative">
             <div class="fixed-logo"><img src="img/logo.png" alt="Logo"></div>
@@ -138,7 +214,7 @@
                         </div>
                     </div>
                     <label class="flex items-center text-sm text-apple-gray cursor-pointer mt-6 mb-7 pl-1">
-                        <input type="checkbox" class="iso-checkbox"> 記住帳戶
+                        <input type="checkbox" class="iso-checkbox" v-model="rememberAccount"> 記住帳戶
                     </label>
                     <button type="submit" class="w-full p-4 bg-primary text-white rounded-ios font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">登入</button>
                 </form>
@@ -146,26 +222,29 @@
         </div>
     </transition>
 
+    <!-- 主應用：側邊欄 + 內容區 -->
     <transition enter-active-class="transition-enter">
-        <div v-if="isLoggedIn" class="flex h-screen w-full">
-            
-            <aside :class="['sidebar-transition bg-white dark:bg-dark-card border-r border-apple-border dark:border-dark-border flex flex-col overflow-hidden', 
+        <div v-if="isLoggedIn" class="flex h-screen w-full min-w-0">
+            <!-- 左側導覽 -->
+            <aside :class="['sidebar-transition bg-white dark:bg-dark-card border-r border-apple-border dark:border-dark-border flex flex-col overflow-hidden shrink-0 min-w-0', 
                             isCollapsed ? 'w-[72px]' : 'w-[196px]']">
                 
                 <div class="h-16 flex items-center border-b border-gray-50 dark:border-white/5 shrink-0 sidebar-pad-x px-0 relative">
                     <div class="flex items-center w-full min-w-0">
                         <div class="flex items-center min-w-0 pl-4">
                             <div class="nav-icon-slot">
-                                <span class="main-title text-2xl leading-none"><span class="highlight-a">A</span></span>
+                                <button type="button" @click="isCollapsed = !isCollapsed"
+                                        class="w-10 h-10 rounded-ios flex items-center justify-center text-apple-gray hover:text-primary hover:bg-apple-bg/80 dark:hover:bg-white/5 transition-colors"
+                                        aria-label="Toggle menu">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-width="2.6" d="M4 7h16M4 12h16M4 17h16" />
+                                    </svg>
+                                </button>
                             </div>
-                            <span class="sidebar-brand-text text-2xl font-extrabold leading-none" :class="{ 'is-collapsed': isCollapsed }">Flema</span>
+                            <span class="sidebar-brand-text text-2xl font-extrabold leading-none" :class="{ 'is-collapsed': isCollapsed }">
+                                <span class="main-title leading-none"><span class="highlight-a">A</span>Flema</span>
+                            </span>
                         </div>
-                        <button type="button" @click="isCollapsed = !isCollapsed" 
-                                class="absolute right-2 top-1/2 -translate-y-1/2 text-apple-gray hover:text-primary transition-colors p-1">
-                            <svg class="w-3.5 h-3.5 transition-transform duration-500" :class="isCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-width="3" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
 
@@ -186,138 +265,223 @@
                         <div class="nav-icon-slot"><div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-black text-sm">A</div></div>
                         <div v-if="!isCollapsed" class="nav-label-wrap ml-2">
                             <p class="text-sm font-bold truncate">Jass Lin</p>
-                            <button @click="isLoggedIn = false" class="text-[10px] text-red-500 font-bold uppercase">登出</button>
+                            <button type="button" @click="handleLogout" class="text-[10px] text-red-500 font-bold uppercase">登出</button>
                         </div>
                     </div>
                 </div>
             </aside>
-            
-            <main class="flex-1 flex flex-col overflow-hidden bg-apple-bg dark:bg-dark-bg">
-<header class="h-16 flex items-center justify-between px-10 shrink-0 bg-white dark:bg-black/20 border-b border-apple-border dark:border-dark-border">
-    <div class="flex flex-col">
-        <div class="flex items-center gap-3">
-            <h1 class="main-title text-xl font-bold">{{ currentMenuName }}</h1>
-            <span class="flex items-center gap-1.5 text-[12px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-                <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span> ONLINE
-            </span>
-        </div>
-    </div>
-    
-    <div class="flex items-center gap-6">
-        <div class="text-[14px] font-bold text-apple-gray text-right">
-            <p class="leading-none uppercase tracking-tighter opacity-60">最後更新{{ currentTime.split(' ')[1] }} 
-            </p>
-        </div>
-        
-        <div class="flex items-center gap-2 border-l border-apple-border dark:border-dark-border pl-6 min-w-[80px] invisible">
-            <span class="text-[10px] font-bold uppercase">Light</span>
-            <div class="iso-switch"><span class="slider"></span></div>
-        </div>
-    </div>
-</header>
 
-                <div class="px-10 h-12 flex items-center justify-between shrink-0 bg-white/50 dark:bg-white/5 text-xs font-bold text-apple-gray uppercase tracking-widest border-b border-apple-border dark:border-dark-border">
-                    <div class="flex items-center gap-6">
-                        <span class="flex items-center gap-2 text-green-600 dark:text-green-500">
-                            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-                        </span>
-                        <span class="opacity-60"></span>
+            <main class="flex-1 flex flex-col overflow-hidden bg-apple-bg dark:bg-dark-bg min-w-0">
+                <!-- 頂欄：分頁標題、連線狀態（更新時間移至下方 h-12 功能列） -->
+                <header class="min-h-16 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 px-4 sm:px-6 lg:px-10 py-2 pr-24 sm:pr-32 lg:pr-40 shrink-0 bg-white dark:bg-black/20 border-b border-apple-border dark:border-dark-border">
+                    <div class="flex flex-col min-w-0">
+                        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                            <h1 class="main-title text-lg sm:text-xl font-bold truncate">{{ currentMenuName }}</h1>
+                            <span class="flex items-center gap-1.5 text-[12px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                                <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span> ONLINE
+                            </span>
+                        </div>
                     </div>
-                    <div class="font-mono"></div>
+                    <!-- 更新時間：小螢幕隱藏，避免擁擠；並預留右側空間避免被日/夜切換遮住 -->
+                    <div class="hidden sm:flex items-center gap-2 font-bold tracking-tight text-apple-gray shrink-0">
+                        <span class="opacity-60">更新</span>
+                        <span class="font-mono">{{ currentTime.split(' ')[1] }}</span>
+                    </div>
+                </header>
+
+                <!-- 主內容上方：預留功能按鍵 / 搜尋區域（各分頁可擴充） -->
+                <div class="px-4 sm:px-6 lg:px-10 h-12 flex items-center justify-between shrink-0 bg-white/50 dark:bg-white/5 text-xs font-bold text-apple-gray uppercase tracking-widest border-b border-apple-border dark:border-dark-border">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <!-- 告警管理：子分頁按鍵 -->
+                        <template v-if="currentTab === 'alerts'">
+                            <div class="flex items-center gap-1 p-1 rounded-ios border border-apple-border dark:border-dark-border bg-white/60 dark:bg-white/5">
+                                <button type="button"
+                                        @click="alertsView = 'events'"
+                                        :class="['h-8 px-3 rounded-[12px] font-black tracking-tight transition-colors',
+                                                 alertsView === 'events'
+                                                    ? 'bg-green-600/15 text-green-600 dark:text-green-400'
+                                                    : 'text-apple-gray hover:bg-apple-bg dark:hover:bg-white/10']">
+                                    告警事件
+                                </button>
+                                <button type="button"
+                                        @click="alertsView = 'rules'"
+                                        :class="['h-8 px-3 rounded-[12px] font-black tracking-tight transition-colors',
+                                                 alertsView === 'rules'
+                                                    ? 'bg-green-600/15 text-green-600 dark:text-green-400'
+                                                    : 'text-apple-gray hover:bg-apple-bg dark:hover:bg-white/10']">
+                                    告警規則 <span class="ml-1 font-mono">{{ alertRules.length }}</span>
+                                </button>
+                                <button type="button"
+                                        @click="alertsView = 'engine'"
+                                        :class="['h-8 px-3 rounded-[12px] font-black tracking-tight transition-colors',
+                                                 alertsView === 'engine'
+                                                    ? 'bg-green-600/15 text-green-600 dark:text-green-400'
+                                                    : 'text-apple-gray hover:bg-apple-bg dark:hover:bg-white/10']">
+                                    規則引擎 <span class="ml-1 font-mono">0</span>
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- 其他分頁：保留區域（後續可放篩選/功能按鈕） -->
+                        <template v-else>
+                            <span class="opacity-60 tracking-widest">功能區預留</span>
+                        </template>
+                    </div>
+
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <!-- 告警管理：搜尋 + 建立/新增按鍵（依子分頁切換） -->
+                        <template v-if="currentTab === 'alerts'">
+                            <div class="relative hidden sm:block">
+                                <input v-model="alertsSearch"
+                                       :placeholder="alertsView === 'events' ? '搜尋告警…' : '搜尋規則…'"
+                                       class="h-9 w-[260px] bg-white/80 dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 pr-9 text-[12px] font-bold tracking-normal outline-none focus:border-primary" />
+                                <svg class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-width="2.5" d="M21 21l-4.35-4.35m1.1-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <button v-if="alertsView === 'rules'"
+                                    type="button"
+                                    class="h-9 px-4 rounded-ios bg-green-600 text-white text-[12px] font-black tracking-tight hover:brightness-110">
+                                新增規則
+                            </button>
+                            <button v-if="alertsView === 'engine'"
+                                    type="button"
+                                    class="h-9 px-4 rounded-ios bg-green-600 text-white text-[12px] font-black tracking-tight hover:brightness-110">
+                                建立新規則
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
-                <div class="flex-1 p-10 overflow-y-auto">
-    
+                <!-- 分頁內容（可捲動） -->
+                <div class="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto overflow-x-hidden min-w-0">
+
+    <!-- ——— 總覽面板 ——— -->
     <div v-if="currentTab === 'dashboard'" class="space-y-6">
+    <!-- 統計卡 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div v-for="stat in [
-            {label:'車輛總數', val:'3000', unit:'輛', color:'text-green-500'}, 
-            {label:'上線車輛', val:'2928', unit:'輛', color:'text-green-500'}, 
-            {label:'今日里程', val:'9.8', unit:'公里', color:'text-green-500'}, 
-            {label:'進行中告警', val:'3', unit:'件', color:'text-orange-500'}]" :key="stat.label" 
+        <div v-for="stat in dashboardStats" :key="stat.label" 
              class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border">
             <p class="text-apple-gray font-bold mb-4">{{stat.label}}</p>
-            <div class="flex items-baseline gap-2">
-                <h3 :class="['text-5xl font-black', stat.color]">{{stat.val}}</h3>
+            <div class="flex items-baseline gap-2 min-w-0">
+                <h3 :class="['text-3xl sm:text-4xl lg:text-5xl font-black tabular-nums truncate', stat.color]">{{stat.val}}</h3>
                 <span class="text-apple-gray font-bold" v-if="stat.unit">{{stat.unit}}</span>
             </div>
         </div>
     </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    
-    <div class="lg:col-span-3 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-8 flex flex-col h-full">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+    <!-- 車輛狀態圖 + 最近告警 -->
+    <div class="lg:col-span-3 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-4 sm:p-6 lg:p-8 flex flex-col h-full min-w-0">
         <div class="flex items-center justify-between mb-6 border-b border-apple-border dark:border-dark-border pb-4">
-            <h4 class="font-bold">車輛狀態</h4>
-            <div class="w-full max-w-[200px] h-1 bg-apple-bg dark:bg-white/10 rounded-full overflow-hidden">
-                <div class="h-full bg-primary w-[70%]"></div>
-            </div>
+            <h4 class="text-apple-gray font-bold">車輛狀態</h4>
         </div>
-        <div class="flex-1 flex items-center justify-center min-h-[400px] text-apple-gray opacity-20">
-            <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-width="1" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+        <!-- 窄螢幕：本小時上線摘要（柱狀圖下方空間較小時輔助閱讀） -->
+        <div class="sm:hidden mb-3 rounded-ios border border-apple-border dark:border-dark-border bg-apple-bg/60 dark:bg-white/5 px-4 py-3">
+            <p class="text-[11px] font-bold text-apple-gray uppercase tracking-wide">本小時上線車輛</p>
+            <p class="text-2xl font-black text-green-600 dark:text-green-400 tabular-nums mt-1">{{ currentChartPoint.value.toLocaleString() }} <span class="text-sm font-bold text-apple-gray">輛</span></p>
+            <p class="text-[10px] text-apple-gray mt-1 font-mono">{{ currentChartPoint.tooltipLabel }}</p>
+        </div>
+        <!-- 13 根柱子：Y 軸刻度見 chartYAxisTicks；柱高 = value / chartMax -->
+        <div class="vehicle-chart w-full max-w-full overflow-hidden">
+            <div class="vehicle-chart-grid">
+                <div class="vehicle-y">
+                    <div v-for="t in chartYAxisTicks" :key="t" class="tick">{{ t.toLocaleString() }}</div>
+                </div>
+                <div class="vehicle-plot" ref="chartPlot" :style="{ '--cols': vehicleChart.length }">
+                    <div class="vehicle-bars">
+                        <div v-for="p in vehicleChart" :key="p.key"
+                             class="vehicle-bar"
+                             :class="{ 'is-active': tooltip.visible && tooltip.key === p.key }"
+                             @mouseenter="onChartEnter($event, p)"
+                             @mousemove="onChartMove($event, p)"
+                             @mouseleave="onChartLeave">
+                            <span :style="{ height: (p.value / chartMax * 100) + '%' }"></span>
+                        </div>
+                    </div>
+                    <div v-if="tooltip.visible" class="vehicle-tooltip"
+                         :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">
+                        <div class="t1">{{ tooltip.label }}</div>
+                        <div class="t2"><span class="sw"></span>{{ tooltip.value.toLocaleString() }}</div>
+                    </div>
+                </div>
+                <!-- 與 Y 軸欄對齊的空白格 -->
+                <div></div>
+                <div class="vehicle-x">
+                    <div></div>
+                    <div class="vehicle-x-labels">
+                        <div v-for="p in vehicleChart" :key="'x-'+p.key" class="tick leading-tight">{{ p.tickLabel }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-6 flex flex-col h-full">
-        <div class="flex justify-between items-center mb-6">
-            <h4 class="font-bold">最近告警</h4>
-            <button @click="currentTab = 'alerts'" class="bg-orange-500 text-white text-xs px-3 py-1 rounded-ios font-bold hover:brightness-110">前往告警事件</button>
+    <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border p-4 sm:p-6 flex flex-col h-full min-w-0">
+        <div class="flex flex-wrap gap-2 justify-between items-center mb-6">
+            <h4 class="text-apple-gray font-bold">最近告警</h4>
+            <button @click="currentTab = 'alerts'" class="bg-orange-500 text-white text-xs px-3 py-1 rounded-ios font-bold hover:brightness-110 shrink-0">前往告警事件</button>
         </div>
-        <div class="space-y-4 flex-1"> <div v-for="i in 3" :key="i" class="p-4 bg-apple-bg dark:bg-white/5 rounded-ios border-l-4 border-orange-500">
-                <p class="text-xs font-bold text-apple-gray mb-1">2026-04-22 14:40</p>
-                <p class="font-bold text-sm">AF-102 嚴重超速</p>
+        <div class="space-y-4 flex-1">
+            <div v-for="a in recentAlerts" :key="a.id"
+                 class="p-4 bg-apple-bg dark:bg-white/5 rounded-ios border-l-4"
+                 :class="a.level === 'Critical' ? 'border-primary' : (a.level === 'Warning' ? 'border-amber-400' : 'border-blue-400')">
+                <p class="text-xs font-bold text-apple-gray mb-1 font-mono">{{ a.datetime }}</p>
+                <p class="font-bold text-sm">{{ a.vcl }} {{ a.type }}</p>
+                <p class="text-[11px] text-apple-gray mt-1 truncate">{{ a.loc }}</p>
             </div>
+            <div v-if="recentAlerts.length === 0" class="text-xs text-apple-gray opacity-60 pt-4">目前無未處理告警</div>
         </div>
     </div>
-</div>
-</div>
+    </div>
+    </div>
 
-    <div v-if="currentTab === 'monitor'" class="h-full flex flex-col">
-        <div class="flex-1 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border flex overflow-hidden">
-            <div class="w-72 border-r border-apple-border dark:border-dark-border flex flex-col bg-gray-50/30 dark:bg-black/20">
+    <!-- ——— 監控中心（列表 + 地圖佔位） ——— -->
+                    <div v-if="currentTab === 'monitor'" class="h-full flex flex-col min-w-0">
+        <div class="flex-1 bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border flex flex-col lg:flex-row overflow-hidden min-w-0">
+            <div class="w-full lg:w-72 border-b lg:border-b-0 lg:border-r border-apple-border dark:border-dark-border flex flex-col bg-gray-50/30 dark:bg-black/20 min-h-[220px] lg:min-h-0 shrink-0">
                 <div class="p-4 border-b border-apple-border dark:border-dark-border">
-                    <input type="text" placeholder="搜尋車號或駕駛..." class="w-full bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 py-2 text-xs outline-none focus:border-primary">
+                    <input type="text" placeholder="搜尋車號或駕駛..." class="w-full bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 py-2 text-sm outline-none focus:border-primary">
                 </div>
                 <div class="flex-1 overflow-y-auto p-2 space-y-2">
                     <div v-for="i in 6" :key="i" class="p-4 rounded-ios bg-white dark:bg-white/5 shadow-sm border border-transparent hover:border-primary/50 transition-all cursor-pointer group">
                         <div class="flex justify-between items-start mb-1">
-                            <span class="font-bold text-sm">AF-{{100 + i}}</span>
+                            <span class="font-bold text-base">AF-{{100 + i}}</span>
                             <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                         </div>
-                        <p class="text-[11px] text-apple-gray">林曉明 · 時速 62 km/h</p>
-                        <p class="text-[10px] text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">點擊追蹤位置</p>
+                        <p class="text-xs text-apple-gray">林曉明 · 時速 62 km/h</p>
+                        <p class="text-[11px] text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">點擊追蹤位置</p>
                     </div>
                 </div>
             </div>
-            <div class="flex-1 bg-slate-100 dark:bg-black/40 relative flex items-center justify-center overflow-hidden">
+            <div class="flex-1 min-h-[280px] lg:min-h-0 bg-slate-100 dark:bg-black/40 relative flex items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#B22222 1px, transparent 1px); background-size: 30px 30px;"></div>
                 <div class="text-center z-10">
                     <div class="w-20 h-20 bg-white dark:bg-dark-card rounded-full shadow-2xl flex items-center justify-center mx-auto mb-4 border border-apple-border dark:border-dark-border">
                         <svg class="w-10 h-10 text-primary animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                     </div>
-                    <p class="text-xs font-bold text-apple-gray uppercase tracking-widest">Map Engine Ready</p>
-                    <p class="text-[10px] text-apple-gray mt-1">等待 GPS 訊號接入...</p>
+                    <p class="text-sm font-bold text-apple-gray uppercase tracking-widest">Map Engine Ready</p>
+                    <p class="text-xs text-apple-gray mt-1">等待 GPS 訊號接入...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div v-if="currentTab === 'reports'" class="space-y-6">
-        <div class="flex items-center justify-between">
-            <div>
+    <!-- ——— 報表分析 ——— -->
+                    <div v-if="currentTab === 'reports'" class="space-y-6 min-w-0">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="min-w-0">
                 <h2 class="text-xl font-bold">歷史行程報表</h2>
-                <p class="text-xs text-apple-gray">查詢過去 30 天內的車輛運行紀錄</p>
+                <p class="text-sm text-apple-gray">查詢過去 30 天內的車輛運行紀錄</p>
             </div>
-            <div class="flex gap-3">
-                <button class="px-4 py-2 bg-white dark:bg-dark-card border border-apple-border dark:border-dark-border text-xs font-bold rounded-ios hover:bg-gray-50 transition-colors">篩選條件</button>
-                <button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-ios shadow-md hover:brightness-110">匯出 CSV</button>
+            <div class="flex flex-wrap gap-3 shrink-0">
+                <button class="px-4 py-2 bg-white dark:bg-dark-card border border-apple-border dark:border-dark-border text-sm font-bold rounded-ios hover:bg-gray-50 transition-colors">篩選條件</button>
+                <button class="px-4 py-2 bg-primary text-white text-sm font-bold rounded-ios shadow-md hover:brightness-110">匯出 CSV</button>
             </div>
         </div>
-        <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-apple-bg dark:bg-white/5 text-[11px] text-apple-gray uppercase font-bold tracking-wider">
+        <div class="bg-white dark:bg-dark-card rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border overflow-x-auto">
+            <table class="w-full text-left min-w-[720px]">
+                <thead class="bg-apple-bg dark:bg-white/5 text-xs text-apple-gray uppercase font-bold tracking-wider">
                     <tr>
                         <th class="px-8 py-5">日期時間</th>
                         <th class="px-8 py-5">車號 / 駕駛</th>
@@ -326,14 +490,14 @@
                         <th class="px-8 py-5">狀態</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm divide-y divide-apple-border dark:divide-dark-border">
+                <tbody class="text-base divide-y divide-apple-border dark:divide-dark-border">
                     <tr v-for="i in 6" :key="i" class="hover:bg-apple-bg dark:hover:bg-white/5 transition-colors cursor-default">
-                        <td class="px-8 py-5 font-mono text-xs">2026-04-22 08:3{{i}}</td>
+                        <td class="px-8 py-5 font-mono text-sm">2026-04-22 08:3{{i}}</td>
                         <td class="px-8 py-5">
                             <p class="font-bold">AF-20{{i}}</p>
-                            <p class="text-[11px] text-apple-gray">陳大文</p>
+                            <p class="text-sm text-apple-gray">陳大文</p>
                         </td>
-                        <td class="px-8 py-5 text-xs">台北轉運站 → 桃園機場</td>
+                        <td class="px-8 py-5 text-sm">台北轉運站 → 桃園機場</td>
                         <td class="px-8 py-5">
                             <div class="flex gap-0.5">
                                 <span v-for="s in 5" :class="['w-2 h-2 rounded-full', s <= 4 ? 'bg-amber-400' : 'bg-gray-200 dark:bg-white/10']"></span>
@@ -348,35 +512,157 @@
         </div>
     </div>
 
-    <div v-if="currentTab === 'alerts'" class="max-w-4xl mx-auto space-y-6">
-        <div class="flex justify-between items-end mb-4">
-            <h2 class="text-xl font-bold">告警管理</h2>
-            <p class="text-xs text-primary font-bold">● 3 則未處理事件</p>
-        </div>
-        <div v-for="alert in [
-            {time:'10:24', type:'嚴重超速預警', vcl:'AF-102', driver:'林曉明', level:'Critical', loc:'國道一號 32K'},
-            {time:'09:45', type:'異常怠速 (超過 15 分鐘)', vcl:'AF-105', driver:'張小華', level:'Warning', loc:'泰山停車場'},
-            {time:'08:12', type:'非預定路徑進入', vcl:'AF-201', driver:'陳大文', level:'Normal', loc:'內湖區瑞光路'}
-        ]" :key="alert.time" 
-             class="bg-white dark:bg-dark-card p-6 rounded-ios-card shadow-sm border-l-4 flex items-center justify-between group hover:shadow-md transition-all"
-             :class="alert.level === 'Critical' ? 'border-primary' : (alert.level === 'Warning' ? 'border-amber-400' : 'border-blue-400')">
-            <div class="flex items-center gap-6">
-                <div class="text-3xl font-black text-apple-gray/20 font-mono">{{alert.time}}</div>
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10">{{alert.vcl}}</span>
-                        <span class="text-xs text-apple-gray">{{alert.driver}}</span>
+    <!-- ——— 告警管理（依附圖：告警事件 / 告警規則 / 規則引擎） ——— -->
+    <div v-if="currentTab === 'alerts'" class="space-y-6 min-w-0">
+        <!-- 子頁：告警事件 -->
+        <div v-if="alertsView === 'events'" class="space-y-4 min-w-0">
+            <div class="flex flex-wrap gap-3 items-center justify-between">
+                <div class="flex flex-wrap gap-2 items-center">
+                    <input v-model="alertsSearch" placeholder="搜尋告警…" class="sm:hidden h-10 w-full bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 text-sm font-bold outline-none focus:border-primary" />
+                    <div class="relative">
+                        <div class="h-10 rounded-ios border border-apple-border dark:border-dark-border bg-white/70 dark:bg-white/5 hover:bg-apple-bg/80 dark:hover:bg-white/10 transition-colors px-3 pr-10 flex items-center">
+                            <select v-model="alertsTypeFilter"
+                                    class="w-full h-full bg-transparent appearance-none text-sm font-black outline-none tracking-tight text-apple-gray">
+                                <option value="all">所有類型</option>
+                                <option value="Critical">Critical</option>
+                                <option value="Warning">Warning</option>
+                                <option value="Normal">Normal</option>
+                            </select>
+                        </div>
+                        <svg class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-width="2.5" d="M6 9l6 6 6-6"/>
+                        </svg>
                     </div>
-                    <h4 class="font-bold text-lg">{{alert.type}}</h4>
-                    <p class="text-[11px] text-apple-gray mt-1 flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        {{alert.loc}}
-                    </p>
+                    <div class="relative">
+                        <div class="h-10 rounded-ios border border-apple-border dark:border-dark-border bg-white/70 dark:bg-white/5 hover:bg-apple-bg/80 dark:hover:bg-white/10 transition-colors px-3 pr-10 flex items-center">
+                            <select v-model="alertsStatusFilter"
+                                    class="w-full h-full bg-transparent appearance-none text-sm font-black outline-none tracking-tight text-apple-gray">
+                                <option value="all">所有狀態</option>
+                                <option value="open">未處理</option>
+                                <option value="ignored">已忽略</option>
+                                <option value="resolved">已處置</option>
+                            </select>
+                        </div>
+                        <svg class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-width="2.5" d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="text-xs text-primary font-bold">● {{ openAlertCount }} 則未處理事件</div>
+            </div>
+
+            <div class="space-y-3">
+                <div v-for="alert in filteredAlerts" :key="alert.id"
+                     class="bg-white dark:bg-dark-card p-4 sm:p-5 rounded-ios-card shadow-sm border border-apple-border dark:border-dark-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 min-w-0">
+                    <div class="flex items-start gap-4 min-w-0">
+                        <div class="mt-0.5 shrink-0 text-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-black text-sm">{{ alert.vcl }}</span>
+                                <span class="text-[11px] font-black px-2 py-0.5 rounded-full"
+                                      :class="alert.level === 'Critical' ? 'bg-primary/15 text-primary' : (alert.level === 'Warning' ? 'bg-amber-400/15 text-amber-600 dark:text-amber-400' : 'bg-blue-400/15 text-blue-600 dark:text-blue-400')">
+                                    {{ alert.level }}
+                                </span>
+                                <span v-if="alert.status !== 'open'" class="text-[11px] font-black px-2 py-0.5 rounded-full"
+                                      :class="alert.status === 'ignored' ? 'bg-gray-200 dark:bg-white/10 text-apple-gray' : 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400'">
+                                    {{ alert.status === 'ignored' ? '已忽略' : '已處置' }}
+                                </span>
+                            </div>
+                            <p class="text-sm font-bold mt-1 truncate">{{ alert.type }}</p>
+                            <p class="text-[11px] text-apple-gray mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                <span class="font-mono">{{ alert.datetime }}</span>
+                                <span class="truncate">📍 {{ alert.loc }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button @click="ignoreAlert(alert.id)" :disabled="alert.status !== 'open'"
+                                class="h-10 px-4 border border-apple-border dark:border-dark-border text-xs font-black rounded-ios hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                            忽略
+                        </button>
+                        <button @click="resolveAlert(alert.id)" :disabled="alert.status !== 'open'"
+                                class="h-10 px-4 bg-primary text-white text-xs font-black rounded-ios shadow-md hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed">
+                            立即處置
+                        </button>
+                    </div>
+                </div>
+                <div v-if="filteredAlerts.length === 0" class="bg-white dark:bg-dark-card rounded-ios-card border border-apple-border dark:border-dark-border p-10 text-center text-sm text-apple-gray">
+                    沒有符合條件的告警事件
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button class="px-4 py-2 border border-apple-border dark:border-dark-border text-xs font-bold rounded-ios hover:bg-gray-50 transition-colors">忽略</button>
-                <button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-ios shadow-md hover:brightness-110">立即處置</button>
+        </div>
+
+        <!-- 子頁：告警規則 -->
+        <div v-else-if="alertsView === 'rules'" class="space-y-6 min-w-0">
+            <div class="flex items-center gap-2 text-sm font-black text-apple-gray">
+                <svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path stroke-width="2.5" d="M12 6v6l4 2"/></svg>
+                <span>系統行為事件訂閱</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div v-for="r in filteredAlertRules" :key="r.id" class="bg-white dark:bg-dark-card rounded-ios-card border border-apple-border dark:border-dark-border p-4 flex flex-col gap-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-ios bg-white/60 dark:bg-white/5 border border-apple-border dark:border-dark-border flex items-center justify-center" v-html="r.icon"></div>
+                                <div class="min-w-0">
+                                    <p class="font-black text-sm truncate">{{ r.title }}</p>
+                                    <p class="text-[11px] text-apple-gray truncate">{{ r.desc }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="iso-switch shrink-0">
+                            <input type="checkbox" v-model="r.enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[11px] font-black text-apple-gray">觸發範圍</span>
+                        <select v-model="r.scope" class="h-9 w-[180px] bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 text-[12px] font-black outline-none">
+                            <option v-for="opt in r.scopes" :key="opt" :value="opt">{{ opt }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-dark-card rounded-ios-card border border-apple-border dark:border-dark-border p-4 sm:p-6">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div class="min-w-0">
+                        <p class="font-black">自定義規則</p>
+                        <p class="text-xs text-apple-gray mt-1">可依車隊需求新增條件與通知對象</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <input v-model="alertsSearch" placeholder="搜尋規則…" class="hidden sm:block h-10 w-[260px] bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 text-sm font-bold outline-none focus:border-primary" />
+                        <button type="button" class="h-10 px-4 rounded-ios bg-green-600 text-white text-xs font-black hover:brightness-110">新增規則</button>
+                    </div>
+                </div>
+                <div class="h-[220px] rounded-ios border border-apple-border dark:border-dark-border bg-apple-bg/60 dark:bg-black/20 flex items-center justify-center text-center p-6">
+                    <div>
+                        <p class="text-sm font-black text-apple-gray">沒有自定義規則</p>
+                        <p class="text-xs text-apple-gray mt-2">點擊右上角「新增規則」開始建立</p>
+                        <p class="text-[11px] text-green-600 dark:text-green-400 mt-3 font-black">建立第一個規則</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 子頁：規則引擎 -->
+        <div v-else class="space-y-4 min-w-0">
+            <div class="bg-white dark:bg-dark-card rounded-ios-card border border-apple-border dark:border-dark-border p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <input v-model="alertsSearch" placeholder="搜尋規則…" class="sm:hidden h-10 w-full bg-white dark:bg-white/5 border border-apple-border dark:border-dark-border rounded-ios px-3 text-sm font-bold outline-none focus:border-primary" />
+                    <div class="text-sm font-black text-apple-gray">規則引擎</div>
+                    <button type="button" class="hidden sm:inline-flex h-10 px-4 rounded-ios bg-green-600 text-white text-xs font-black hover:brightness-110">建立新規則</button>
+                </div>
+                <div class="h-[320px] rounded-ios border border-apple-border dark:border-dark-border bg-apple-bg/60 dark:bg-black/20 flex items-center justify-center text-center p-6">
+                    <div>
+                        <svg class="w-10 h-10 mx-auto opacity-50 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 6v6l4 2"/><path stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-sm font-black text-apple-gray">沒有符合條件的規則</p>
+                        <p class="text-xs text-apple-gray mt-2">建立規則後，系統將依條件自動觸發告警與通知</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -387,20 +673,37 @@
     </transition>
 </div>
 
+<!-- Vue 應用：見下方 setup() 區塊註解 -->
 <script>
     const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+    /** localStorage key：記住帳戶（僅保存 account，不保存密碼） */
+    const REMEMBER_ACCOUNT_KEY = 'af_remember_account';
+    /** 示範用車隊規模（總覽統計、圖表上限與 pseudo 上線數一致） */
+    const FLEET_TOTAL = 3000;
+    /** 柱狀圖 Y 軸最大值（與刻度、柱高百分比共用） */
+    const CHART_Y_MAX = 3000;
+
     createApp({
         setup() {
+            // ---------- 全域 UI 狀態 ----------
             const isDark = ref(false);
             const isLoggedIn = ref(false);
             const isCollapsed = ref(false);
+            const currentTab = ref('dashboard');
+            const currentTime = ref('');
+            let timer;
+
+            // ---------- 登入表單 ----------
             const showPwd = ref(false);
             const loginError = ref(false);
             const form = ref({ account: '', password: '' });
-            const currentTime = ref('');
-            const currentTab = ref('dashboard');
-            let timer;
+            const rememberAccount = ref(false);
 
+            // ---------- 車輛圖表（柱狀圖 plot 區 DOM，供 tooltip 座標） ----------
+            const chartPlot = ref(null);
+
+            // ---------- 側邊選單 ----------
             const menu = ref([
                 { id: 'dashboard', name: '總覽面板', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6h6v6H4zM14 6h6v6h-6zM4 16h6v6H4zM14 16h6v6h-6z"/></svg>' },
                 { id: 'monitor', name: '監控中心', icon: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
@@ -413,15 +716,218 @@
                 return item ? item.name : '';
             });
 
+            // ---------- 總覽：車輛狀態柱狀圖（登入後固定，不隨時鐘滾動） ----------
+            /** 圖表時間軸錨點＝登入時刻「整點」；資料為錨點前 12 小時～錨點共 13 點 */
+            const loginChartAnchor = ref(null);
+            /** 登入的實際時間戳（今日里程：當日 00:00～登入時刻） */
+            const loginAtFull = ref(null);
+
+            const pad2 = (n) => String(n).padStart(2, '0');
+            const sameCalendarDay = (a, b) =>
+                a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+            const formatChartTip = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:00`;
+            const formatChartTick = (d, anchor) =>
+                sameCalendarDay(d, anchor) ? `${pad2(d.getHours())}:00` : `${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}`;
+            /** 示範用偽隨機上線數：0～4 時均小於 1000，其餘不超過 FLEET_TOTAL */
+            const pseudoVehicleCount = (d) => {
+                const h = d.getHours();
+                const day = d.getDate();
+                if (h >= 0 && h <= 4) {
+                    return 320 + ((h * 97 + day * 31) % 679);
+                }
+                const v = 1400 + ((h * 73 + day * 29) % 1601);
+                return Math.min(FLEET_TOTAL, v);
+            };
+
+            const vehicleChart = computed(() => {
+                const anchor = loginChartAnchor.value;
+                if (!anchor) return [];
+                const pts = [];
+                for (let i = 12; i >= 0; i--) {
+                    const t = new Date(anchor.getTime() - i * 3600000);
+                    const key = Math.floor(t.getTime() / 3600000);
+                    pts.push({
+                        key,
+                        hour: t.getHours(),
+                        value: pseudoVehicleCount(t),
+                        tickLabel: formatChartTick(t, anchor),
+                        tooltipLabel: formatChartTip(t),
+                    });
+                }
+                return pts;
+            });
+            const chartMax = CHART_Y_MAX;
+            const chartYAxisTicks = computed(() => {
+                const max = CHART_Y_MAX;
+                const step = max / 5;
+                return [max, max - step, max - step * 2, max - step * 3, max - step * 4, 0].map(v => Math.round(v));
+            });
+            const tooltip = ref({ visible: false, x: 0, y: 0, key: null, label: '', value: 0 });
+            const onChartEnter = (evt, p) => {
+                tooltip.value.visible = true;
+                tooltip.value.key = p.key;
+                tooltip.value.label = p.tooltipLabel;
+                tooltip.value.value = p.value;
+                onChartMove(evt, p);
+            };
+            const onChartMove = (evt, p) => {
+                if (!chartPlot.value) return;
+                const rect = chartPlot.value.getBoundingClientRect();
+                tooltip.value.x = Math.min(Math.max(evt.clientX - rect.left, 12), rect.width - 12);
+                tooltip.value.y = Math.min(Math.max(evt.clientY - rect.top, 20), rect.height - 10);
+                tooltip.value.key = p.key;
+                tooltip.value.label = p.tooltipLabel;
+                tooltip.value.value = p.value;
+            };
+            const onChartLeave = () => { tooltip.value.visible = false; };
+
+            // ---------- 告警（總覽「最近告警」與分頁「告警管理」共用） ----------
+            const alerts = ref([
+                { id: 'a1', datetime: '2026-04-22 14:40', time: '14:40', type: '嚴重超速預警', vcl: 'AF-102', driver: '林曉明', level: 'Critical', loc: '國道一號 32K', status: 'open' },
+                { id: 'a2', datetime: '2026-04-22 09:45', time: '09:45', type: '異常怠速 (超過 15 分鐘)', vcl: 'AF-105', driver: '張小華', level: 'Warning', loc: '泰山停車場', status: 'open' },
+                { id: 'a3', datetime: '2026-04-22 08:12', time: '08:12', type: '非預定路徑進入', vcl: 'AF-201', driver: '陳大文', level: 'Normal', loc: '內湖區瑞光路', status: 'open' },
+            ]);
+            const openAlerts = computed(() => alerts.value.filter(a => a.status === 'open'));
+            const recentAlerts = computed(() => openAlerts.value.slice(0, 3));
+            const openAlertCount = computed(() => openAlerts.value.length);
+            const ignoreAlert = (id) => {
+                const a = alerts.value.find(x => x.id === id);
+                if (a && a.status === 'open') a.status = 'ignored';
+            };
+            const resolveAlert = (id) => {
+                const a = alerts.value.find(x => x.id === id);
+                if (a && a.status === 'open') a.status = 'resolved';
+            };
+
+            // ---------- 告警管理：子分頁 / 搜尋 / 篩選 ----------
+            const alertsView = ref('events'); // events | rules | engine
+            const alertsSearch = ref('');
+            const alertsTypeFilter = ref('all');
+            const alertsStatusFilter = ref('all');
+            const filteredAlerts = computed(() => {
+                const q = alertsSearch.value.trim().toLowerCase();
+                return alerts.value.filter(a => {
+                    const matchQ = !q || [a.vcl, a.driver, a.type, a.loc, a.datetime, a.level].some(x => String(x).toLowerCase().includes(q));
+                    const matchType = alertsTypeFilter.value === 'all' || a.level === alertsTypeFilter.value;
+                    const matchStatus = alertsStatusFilter.value === 'all' || a.status === alertsStatusFilter.value;
+                    return matchQ && matchType && matchStatus;
+                });
+            });
+
+            // ---------- 告警規則（示範資料：依附圖呈現卡片 + 開關 + 範圍下拉） ----------
+            const alertRules = ref([
+                {
+                    id: 'r1',
+                    title: '急煞車',
+                    desc: '偵測到急煞車事件時發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 6v6m0 4h.01"/><path stroke-width="2.5" d="M4 12a8 8 0 1016 0 8 8 0 00-16 0z"/></svg>',
+                },
+                {
+                    id: 'r2',
+                    title: '急加速',
+                    desc: '偵測到急加速事件時發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+                },
+                {
+                    id: 'r3',
+                    title: '怠速',
+                    desc: '怠速超過指定時間發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 8v4l3 2"/><path stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                },
+                {
+                    id: 'r4',
+                    title: '超速',
+                    desc: '超速達到門檻值發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 19a3 3 0 006 0"/><path stroke-width="2.5" d="M10 13l2-2 2 2"/><path stroke-width="2.5" d="M4 12a8 8 0 1016 0 8 8 0 00-16 0z"/></svg>',
+                },
+                {
+                    id: 'r5',
+                    title: '疲勞',
+                    desc: '連續行駛超過指定時間發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M3 12h6l3-9 3 18 3-9h3"/></svg>',
+                },
+                {
+                    id: 'r6',
+                    title: '駕駛異常',
+                    desc: '偵測到駕駛異常狀態發送告警',
+                    enabled: true,
+                    scope: '三類車 1（綁車）',
+                    scopes: ['三類車 1（綁車）', '三類車 2（綁車）', '全部車輛'],
+                    icon: '<svg class="w-4 h-4 text-apple-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M12 8a3 3 0 100 6 3 3 0 000-6z"/><path stroke-width="2.5" d="M20 21a8 8 0 10-16 0"/></svg>',
+                },
+            ]);
+            const filteredAlertRules = computed(() => {
+                const q = alertsSearch.value.trim().toLowerCase();
+                if (!q) return alertRules.value;
+                return alertRules.value.filter(r => [r.title, r.desc].some(x => String(x).toLowerCase().includes(q)));
+            });
+
+            /** 圖表最後一點＝錨點小時上線數（統計卡「上線車輛」、今日里程用） */
+            const currentChartPoint = computed(() => {
+                const pts = vehicleChart.value;
+                return pts.length ? pts[pts.length - 1] : { value: 0, tooltipLabel: '' };
+            });
+
+            /** 今日里程(km)＝當日 00:00～登入時刻的小時數 × 上線車輛 × 40 */
+            const todayMileageKm = computed(() => {
+                if (!loginAtFull.value) return 0;
+                const t = loginAtFull.value;
+                const dayStart = new Date(t.getFullYear(), t.getMonth(), t.getDate(), 0, 0, 0, 0);
+                const hours = Math.max(0, (t.getTime() - dayStart.getTime()) / 3600000);
+                const online = currentChartPoint.value?.value ?? 0;
+                const kmPerVehiclePerHour = 40;
+                return online * hours * kmPerVehiclePerHour;
+            });
+
+            // ---------- 總覽統計卡 ----------
+            const dashboardStats = computed(() => {
+                const total = FLEET_TOTAL;
+                const online = currentChartPoint.value?.value ?? 0;
+                const alertsOpen = openAlertCount.value;
+                const mileage = Math.round(todayMileageKm.value).toLocaleString('zh-TW');
+                return [
+                    { label: '車輛總數', val: String(total), unit: '輛', color: 'text-green-500' },
+                    { label: '上線車輛', val: String(online), unit: '輛', color: 'text-green-500' },
+                    { label: '今日里程', val: mileage, unit: '公里', color: 'text-green-500' },
+                    { label: '進行中告警', val: String(alertsOpen), unit: '件', color: 'text-orange-500' },
+                ];
+            });
+
             const toggleDarkMode = () => document.documentElement.classList.toggle('dark', isDark.value);
-            
+
             const handleLogin = () => {
                 if (!form.value.account || !form.value.password) {
                     loginError.value = true;
                     setTimeout(() => loginError.value = false, 3000);
                     return;
                 }
+                if (rememberAccount.value) localStorage.setItem(REMEMBER_ACCOUNT_KEY, form.value.account);
+                else localStorage.removeItem(REMEMBER_ACCOUNT_KEY);
+                const d = new Date();
+                loginAtFull.value = d;
+                loginChartAnchor.value = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), 0, 0, 0);
                 isLoggedIn.value = true;
+            };
+
+            const handleLogout = () => {
+                loginChartAnchor.value = null;
+                loginAtFull.value = null;
+                isLoggedIn.value = false;
             };
 
             const updateTime = () => {
@@ -430,12 +936,29 @@
             };
 
             onMounted(() => {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) { isDark.value = true; toggleDarkMode(); }
-                updateTime(); timer = setInterval(updateTime, 1000);
+                const savedAccount = localStorage.getItem(REMEMBER_ACCOUNT_KEY);
+                if (savedAccount) {
+                    form.value.account = savedAccount;
+                    rememberAccount.value = true;
+                }
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    isDark.value = true;
+                    toggleDarkMode();
+                }
+                updateTime();
+                timer = setInterval(updateTime, 1000);
             });
             onUnmounted(() => clearInterval(timer));
 
-            return { isDark, isLoggedIn, isCollapsed, showPwd, loginError, form, menu, currentTime, currentTab, currentMenuName, toggleDarkMode, handleLogin };
+            return {
+                isDark, isLoggedIn, isCollapsed, showPwd, loginError, form, rememberAccount, menu, currentTime, currentTab, currentMenuName,
+                toggleDarkMode, handleLogin, handleLogout,
+                chartPlot, vehicleChart, chartMax, chartYAxisTicks, tooltip, onChartEnter, onChartMove, onChartLeave,
+                alerts, recentAlerts, openAlertCount, ignoreAlert, resolveAlert,
+                alertsView, alertsSearch, alertsTypeFilter, alertsStatusFilter, filteredAlerts,
+                alertRules, filteredAlertRules,
+                currentChartPoint, dashboardStats,
+            };
         }
     }).mount('#app');
 </script>
