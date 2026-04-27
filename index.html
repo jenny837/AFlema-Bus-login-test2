@@ -138,6 +138,7 @@
             pointer-events: none;
             z-index: 50;
         }
+        .vehicle-tooltip.is-below { transform: translate(-50%, 14%); }
         .dark .vehicle-tooltip { background: rgba(255,255,255,0.92); color: #0A0A0C; border-color: rgba(0,0,0,0.06); }
         .vehicle-tooltip .t1 { font-size: 10px; font-weight: 900; opacity: 0.95; }
         .vehicle-tooltip .t2 { margin-top: 2px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
@@ -154,9 +155,21 @@
             border-bottom: 1px solid rgba(255,255,255,0.10);
             transform: translateX(-50%) rotate(45deg);
         }
+        .vehicle-tooltip.is-below::after{
+            top: -6px;
+            bottom: auto;
+            border-right: 0;
+            border-bottom: 0;
+            border-left: 1px solid rgba(255,255,255,0.10);
+            border-top: 1px solid rgba(255,255,255,0.10);
+        }
         .dark .vehicle-tooltip::after {
             border-right-color: rgba(0,0,0,0.06);
             border-bottom-color: rgba(0,0,0,0.06);
+        }
+        .dark .vehicle-tooltip.is-below::after{
+            border-left-color: rgba(0,0,0,0.06);
+            border-top-color: rgba(0,0,0,0.06);
         }
 
         /* ========== 深色模式開關（頂欄與登入頁共用元件） ========== */
@@ -455,7 +468,7 @@
                                             : 'text-apple-gray bg-white/40 dark:bg-white/5 border-apple-border dark:border-dark-border')
                                 ]">
                                 <span class="w-1 h-1 rounded-full bg-current" :class="connectionState === 'online' ? 'animate-pulse' : ''"></span>
-                                {{ connectionState === 'online' ? 'ONLINE' : (connectionState === 'offline' ? '未在線上' : '檢查中') }}
+                                {{ connectionState === 'online' ? 'ONLINE' : (connectionState === 'offline' ? '網路斷線' : '檢查中') }}
                             </span>
                         </div>
                     </div>
@@ -569,7 +582,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div v-if="tooltip.visible" class="vehicle-tooltip"
+                    <div v-if="tooltip.visible" class="vehicle-tooltip" :class="{ 'is-below': tooltip.placement === 'bottom' }"
                          :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">
                         <div class="t1">{{ tooltip.label }}</div>
                         <div class="t2"><span class="sw"></span>{{ tooltip.value.toLocaleString() }}</div>
@@ -1011,7 +1024,7 @@
                 const step = max / 5;
                 return [max, max - step, max - step * 2, max - step * 3, max - step * 4, 0].map(v => Math.round(v));
             });
-            const tooltip = ref({ visible: false, x: 0, y: 0, key: null, label: '', value: 0 });
+            const tooltip = ref({ visible: false, x: 0, y: 0, key: null, label: '', value: 0, placement: 'top' });
             const onChartEnter = (evt, p) => {
                 tooltip.value.visible = true;
                 tooltip.value.key = p.key;
@@ -1025,7 +1038,9 @@
                 const cellRect = evt && evt.currentTarget && evt.currentTarget.getBoundingClientRect ? evt.currentTarget.getBoundingClientRect() : null;
                 const centerX = cellRect ? (cellRect.left + cellRect.width / 2) : evt.clientX;
                 tooltip.value.x = Math.min(Math.max(centerX - rect.left, 12), rect.width - 12);
-                tooltip.value.y = Math.min(Math.max(evt.clientY - rect.top, 20), rect.height - 10);
+                const rawY = evt.clientY - rect.top;
+                tooltip.value.placement = rawY < 78 ? 'bottom' : 'top';
+                tooltip.value.y = Math.min(Math.max(rawY, 20), rect.height - 10);
                 tooltip.value.key = p.key;
                 tooltip.value.label = p.tooltipLabel;
                 tooltip.value.value = p.value;
